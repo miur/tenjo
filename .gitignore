@@ -1,0 +1,11 @@
+#
+# SPDX-FileCopyrightText: 2020 Dmytro Kolomoiets <amerlyq+tenjo@gmail.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+## Generated build logs, local pkgs, etc.
+/_build*/
+
+## Local-only reference materials, temporary cloned repos, etc.
+&*/
