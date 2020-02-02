@@ -33,7 +33,7 @@ If you are hooked, read how is it possible below.
 USAGE
 =====
 
-.. warn::
+.. warning::
    Remember! ``tenjo(1)`` implementation is nothing more than "convenient and efficient tool".
    You can manage tasks fully manually by using only ``git(1)`` and your favorite **file manager**.
 
@@ -121,7 +121,7 @@ I recommend using ``reStructuredText`` format for all your notes.
 Then you will be able to generate wiki web site directly from tasks worklogs,
 or parse and convert them into changelogs, dashboards and weekly reports.
 
-Convictions:
+Reasonings:
 
 * You don't need to have any commit description, really. Because they have no additional value.
 * Everybody works on ``master``. Branches here have no meaning -- only history of changes matters.

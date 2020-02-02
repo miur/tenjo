@@ -16,7 +16,8 @@ license=('Apache-2.0')
 arch=('any')
 
 depends=(
-  git
+  # docker
+  git  # OR: mercurial
   zsh
 )
 
