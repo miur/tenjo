@@ -1,0 +1,8 @@
+DEV: plugin for ranger ⌇HU+nu
+
+* easily create new tasks by template with new automatic xtref inside
+  ?? BUT: we can use task birthtime instead ??
+  ALSO: we need UUID anyway, why bother to have both UUID and xtref
+    ? different domains and purpose -- tasks exchange .vs. local indexing
+
+* manipulate tasks only
