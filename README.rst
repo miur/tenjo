@@ -72,14 +72,14 @@ and store artifacts -- use folder with the same name as task, "divide and conque
    touch "refactoring-step-2.task"
    git add --all && git commit --allow-empty-message
 
-When you are done with subtask -- simply move it into ``./_done/``,
+When you are done with subtask -- simply move it into ``./.done/``,
 regardless if subtask is a standalone file or became a directory too:
 
 .. code-block:: bash
 
    cd myproject/short-desc_for_feature.task
-   mkdir -p _done
-   mv -vt _done "bug-on-input.task"
+   mkdir -p .done
+   mv -vt .done "bug-on-input.task"
    git add --all && git commit --allow-empty-message
 
 When you had finished whole task -- move whole task:
@@ -87,23 +87,23 @@ When you had finished whole task -- move whole task:
 .. code-block:: bash
 
    cd myproject
-   mkdir -p _done
-   mv -vt _done "short-desc_for_feature.task"
+   mkdir -p .done
+   mv -vt .done "short-desc_for_feature.task"
    git add --all && git commit --allow-empty-message
 
 And when your project was closed -- move whole project:
 
 .. code-block:: bash
 
-   mkdir -p _done
-   mv -vt _done "myproject"
+   mkdir -p .done
+   mv -vt .done "myproject"
    git add --all && git commit --allow-empty-message
 
 That's all.
 With your favorite **file manager** it will be piece of cake.
 
 Of course, tasks may undergo very long journey through different folders until
-they find themselves inside ``./_done/``.
+they find themselves inside ``./.done/``.
 Read full spec RFC below for more complex conceptual worklows you can build.
 
 
@@ -120,6 +120,10 @@ File ``*.task`` has completely arbitrary textual format.
 I recommend using ``reStructuredText`` format for all your notes.
 Then you will be able to generate wiki web site directly from tasks worklogs,
 or parse and convert them into changelogs, dashboards and weekly reports.
+
+Folder ``./.done/`` will become hidden on linux, which will prevent it from being accessed
+by file manager preview each time you open project directory -- which may become quite expensive
+after number of your task files will exceed ~5000 on typical filesystem.
 
 Reasonings:
 
