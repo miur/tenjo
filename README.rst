@@ -58,6 +58,7 @@ before creating symlink (``tenjo`` tool will do this automatically for you).
    │       └── a-b-c.task
    ├── collab-project
    │   ├── .cancelled
+   │   ├── .done             # can be used to archive whole "@user1" when he is transferred to another project or company
    │   ├── @user1
    │   │   ├── .done
    │   │   │   └── a.task
