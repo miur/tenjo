@@ -1,0 +1,10 @@
+# vim:ft=zsh
+
+function $0:t {
+  local nmg=
+  LC_ALL=C tree --noreport -aAC --prune --matchdirs --dirsfirst \
+    -I ".*" -I "_*" -P "${nmg}*.task" -- $@ | tail -n +2
+}
+
+
+$0:t $@

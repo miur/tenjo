@@ -1,0 +1,52 @@
+#!/usr/bin/env zsh
+#%SUMMARY:
+#%USAGE: $ ./$0
+set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
+
+# TODO: replace on install by /usr/share/tenjo/functions
+lib=$0:A:h/functions
+fpath=( $lib $fpath )
+
+autoload -Uz tenjo_tree
+
+if ((!$#)); then
+  tenjo_tree $PWD
+  exit
+fi
+
+# autoload -Uz $fpath[1]/*(.:t)
+# autoload -Uz aura_stat
+# print -l $fpath  # DEBUG=
+# aura_stat $0
+
+action=$1
+shift
+
+## BAD: one logical change may include more than one task
+# function commit { local task=$1
+#   git add $task
+#   git commit --allow-empty-message $task
+# }
+
+function task_expand { local task=$1
+  local sfx='.tmp'
+  mkdir -p "${task}${sfx}"
+  mv -vT "${task}" "${task}${sfx}/TASK"
+  mv -vT "${task}${sfx}" "${task}"
+}
+
+case $action
+in add)
+  touch "$*.task"
+
+;; expand)
+  task=$*
+  task=${task%.task}.task
+  task_expand $task
+
+;; fix)
+  echo "TBD: fix all symlinks for deps based on prev commits history"
+  exit 3
+
+;; *) echo "Err: $*"; exit 2
+esac

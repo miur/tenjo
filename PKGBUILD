@@ -28,7 +28,10 @@ makedepends=(
 package() {
   prefix=$pkgdir/usr
   datadir=$prefix/share
+
+  make dev-install prefix=/usr DESTDIR="$pkgdir"
   # make install prefix="$prefix"
+
   install -Dm644 -t "$datadir/licenses/$pkgbase" -- $(printf 'LICENSES/%s.txt\n' "${license[@]}")
   install -Dm644 -t "$datadir/doc/$pkgbase" -- README.rst
 }
