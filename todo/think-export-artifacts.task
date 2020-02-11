@@ -1,0 +1,10 @@
+
+What to do with workdir files (artifacts) accumulated when working on task ?
+  * archive everything together with task
+    ? keep everything only inside task -- and refer to archieved artifacts directly
+    ? copy only useful parts (export) into some external systems (e.g. bitbucket, confluence, etc.)
+      ~~ actually, I must clearly define this vague boundary between "working on task" and "sharing results"
+        to cross this boundary explicitly and convert/pick data only at the moment of crossing
+      !! task without exported results (or side-effects) is useless and has no reason to exist !!
+  * post-process :: export useful, archive temporary parts, and remove [large] useless stuff
+    ? where to get time on that in overall workflow

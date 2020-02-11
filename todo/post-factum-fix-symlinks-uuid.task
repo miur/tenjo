@@ -1,0 +1,6 @@
+
+ALSO: separate script to fix symlinks/uuid post-factum
+  -- when many tasks were added before git hooks were installed
+    ~~ prevent next git commit
+
+  ?? allow automatic local history-rewrite ??

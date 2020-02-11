@@ -1,0 +1,8 @@
+
+NEED: "git lfs uncheckout" for single folder of artifacts
+
+  REQ: Add command to undo fetch and checkout · Issue #1189 · git-lfs/git-lfs ⌇⡞⡂⣆⢊
+    https://github.com/git-lfs/git-lfs/issues/1189
+
+  Panic when trying git lfs clean · Issue #944 · git-lfs/git-lfs ⌇⡞⡂⣆⢻
+    https://github.com/git-lfs/git-lfs/issues/944#issuecomment-175418615

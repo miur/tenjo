@@ -1,0 +1,3 @@
+I need symlinks deps and place to store artifacts most of the time
+  MAYBE: use by default dir-based tasks and convert to file-based on demand
+    i.e. merge .uuid + description + deps-links + all other files

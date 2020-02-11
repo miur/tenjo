@@ -1,0 +1,3 @@
+THINK: what to do with when untracked files are both renamed and moved -- how to fix symlinks ?
+  ! problem may occur even for tracked files :: commit, rename, create symlink, rename, try-to-commit
+  ~~ simply prevent commit and force user to fix symlinks by himself

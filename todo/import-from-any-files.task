@@ -1,0 +1,8 @@
+IDEA: parse files for /[_] .../ things
+  => directly treat them as file-based tasks
+    * allow xrefs, blockers and agendas for them
+    * directly close these tasks from inside agenda by back-propagation of edits
+  => convert them to file/dir based tasks on demand
+  + when you allow multiple tasks per file with some surrounding context
+    -- there will be no difference if you embed tasks into another syntax \
+      or invent for them their own syntax and file mime-type

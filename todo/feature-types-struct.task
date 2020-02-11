@@ -1,0 +1,16 @@
+Each feature has rigid structure
+  * journal
+  * src
+  * test
+  * ...
+
+And task journal also can have rigid structure
+  * bugs
+  * future
+  * ideas
+  * next
+  * rfc
+  * ...
+
+  i.e. you group tasks not solely by types, but more likely by activity you expect to apply to them
+  !! of course *feature* itself must be small enough to not accumulate too much very different bugs/etc inside subdir
