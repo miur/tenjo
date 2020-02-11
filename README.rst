@@ -6,25 +6,29 @@
 tenjo
 #####
 
-Tasks enframing journal -- to manage, track and account your goals and progress.
+Tasks enframing journal -- to manage, track and account your goals and progress for highly entangled projects.
 
 .. note::
    Etymology: "天助" (/tenjo/) -- jp. "help of heavens"
 
-Kind of DPMS -- Distributed Project Management System (consonant: "di-plo-ma-cy" :D),
-contrasting to most others centralized project management solutions, like Jira and Trello.
+Kind of DPMS -- Distributed Project Management System (consonant: "di-plo-ma-cy" :D)
+with explicit and conscious resolution of conflicts, contrasting to most others centralized
+project management solutions, like Jira and Trello, based on locks inside "one source of truth".
+
 
 Raison d'être
 =============
 
 * Store offline like git -- never lose task history even on your own PC.
-* Distribute info like git -- sync repo copies between all your devices.
-* Merge conflicts like git -- explicitly decide what to do, only when your descriptions differ.
+* Distribute info like git -- advance progress and sync repo copies between all your devices.
+* Merge conflicts like git -- explicitly decide what to do, how to do, and only when your descriptions differ.
 * Collaborate with others like git -- give everyone his "personal world" (local clone) to live inside with time lag.
 * Improve work of others like git -- create independent fork, enhance workflows and share when ready.
-* Review and feedback like git -- annotate changes in tasks and their statuses, with same web tools.
+* Review and feedback like git -- annotate changes in tasks and their statuses, with the same web tools for code reviewing.
 * Federate like IRC -- embrace the idea of "person" and "company" are two different and largely incompatible worlds.
   Only *communicate* tasks between them, between their inherent contexts, but don't try to fully embed one into another.
+* Generate reports along CI/CD -- use server jobs to re-generate reports and dashboards on each commit (like testing).
+* Integrate under single git -- store tasks alongside your project source code inside **feature/tasks/** folder per each module
 
 We have all pieces needed to build decent tasks management solution.
 If you are hooked, read how is it possible below.
