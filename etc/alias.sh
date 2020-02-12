@@ -16,6 +16,9 @@ function _tenjo_alias { local nm=$1; shift
 }
 
 function _tenjo_init {
+  # BET:(zsh-only): $ { ... } always { unfunction -m "_tenjo_*"; }
+  #   Re: Local inner functions ⌇⡞⡂⣣⡹
+  #     https://www.zsh.org/mla/users/2011/msg00207.html
   function TRAPEXIT { unset -f _tenjo_alias _tenjo_init; }  # if $ZSH_NAME
   [[ -n ${BASH-} ]] && trap 'TRAPEXIT; unset -f TRAPEXIT; trap - RETURN' RETURN
 
