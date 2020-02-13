@@ -1,0 +1,21 @@
+FMT: tasks templates
+  * R=11:00=P1D-meeting.task
+  * R=XXXX-12-31=P1Y-new-year-party.task
+
+  FAIL: ":" is not supported on Windows fs :: NTFS / FAT / Samba
+  NEED: spec like "each workday beside holidays" -- i.e. intersection with exported calendar
+  BAD: fmt is too messy
+
+
+IDEA: clone task templates into real e.g. "2020-02-13_18:00" folders
+  * for period > 2 week -- ignore until deadline < 2 week
+  * for period < 1 week -- add next event only after current one expired
+    i.e. keep only one daily task in queue
+
+USE: hook script -- run after each command
+  * decide if needed to regenerate recurring tasks
+  * immediately commit into git new copies of tasks
+
+
+MAYBE: use systemd/cron to generate recurring tasks
+  -- if I wish for realtime notifications / timetracking anyway

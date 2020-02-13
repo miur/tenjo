@@ -7,10 +7,10 @@ set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
 lib=$0:A:h/functions
 fpath=( $lib $fpath )
 
-autoload -Uz tenjo_tree
+autoload -Uz tenjo-tree
 
 if ((!$#)); then
-  tenjo_tree $PWD
+  tenjo-tree $PWD
   exit
 fi
 

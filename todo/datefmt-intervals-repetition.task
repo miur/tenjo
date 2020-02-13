@@ -1,6 +1,17 @@
+FIND: alternatively used widespread formats for planners, usable as fs dir name
+ALSO: look into fmt used by:
+  * org-mode
+  * taskwarrior
+  * ...
+
+
+BAD: iso8601 don't have notation for recurring periodic intervals (i.e. calendar-based)
 
   interval / repetition ⌇⡞⡂⡿⢈
     https://en.wikipedia.org/wiki/ISO_8601#Time_intervals
+
+  ISO 8601 · cylc/cylc-flow Wiki ⌇⡞⡅⡛⣒
+    https://github.com/cylc/cylc-flow/wiki/ISO-8601
 
   ISO-8601, YYYY, yyyy, and why your year may be wrong — Erica Sadun ⌇⡞⡂⡯⢋
     https://ericasadun.com/2018/12/25/iso-8601-yyyy-yyyy-and-why-your-year-may-be-wrong/

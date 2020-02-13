@@ -1,0 +1,35 @@
+IDEA: use "* filter=lfs" inside .gitattribute -- and explicitly move files to normal git
+
+  git lfs - Move Git LFS tracked files under regular Git - Stack Overflow ⌇⡞⡅⠚⡴
+    https://stackoverflow.com/questions/35011366/move-git-lfs-tracked-files-under-regular-git
+
+  $ git lfs untrack TASK
+  $ git add --renormalize .
+  $ git commit -m "[%] undo git-lfs for TASK"
+  $ git lfs ls-files
+
+  OR:(add --renormalize):
+    $ git rm --cached TASK
+    $ git add TASK
+
+  CHECK: reverse operation
+    $ git lfs track 'huge.txt'
+    $ git add --renormalize .
+    $ git commit -m "[%] move huge.txt into git-lfs"
+    $ git lfs ls-files
+
+  ALT:(rewrite history): move files into LFS -- if you accidentally committed large files to a repo
+    $ git lfs migrate import --fixup --include-ref=refs/heads/master
+
+    2020-02-13 [X] ALT: Migrate a Git repo into Git LFS with BFG | GitLab ⌇⡞⡅⠞⡩
+      https://docs.gitlab.com/ee/topics/git/migrate_to_git_lfs/
+      ...
+      $ bfg --convert-to-git-lfs "*.{png,mp4,jpg,gif}" --no-blob-protection test-git-lfs-repo-migration.git
+      $ git reflog expire --expire=now --all && git gc --prune=now --aggressive
+      ...
+
+  ALSO: pull one file/pattern/dir from remote
+    $ git lfs pull -I "data/some.jpg"
+    $ git lfs pull -I "data/*.jpg"
+    $ git lfs pull -I "data/"
+    $ git lfs pull -I "data/" [other-remote]
