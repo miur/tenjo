@@ -1,0 +1,19 @@
+########################################
+## Unignore global ignore
+!*
+
+
+########################################
+## Generated build logs, local pkgs, etc.
+/_build*/
+
+
+########################################
+## Local-only reference materials, temporary cloned repos, etc.
+&*/
+
+
+########################################
+## Ctags and xtrefs db
+tags
+*.tags

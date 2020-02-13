@@ -1,0 +1,14 @@
+# Manage everything by Git-LFS
+*  filter=lfs diff=lfs merge=lfs -text
+
+# Tasks are the main content of repo
+*.task  filter= diff= merge= text
+TASK    filter= diff= merge= text
+
+# Allow documentation files to be genuine part of repo
+*.rst   filter= diff= merge= text
+*.nou   filter= diff= merge= text
+
+# System files are indivisible from repo
+.gitignore      filter= diff= merge= text
+.gitattributes  filter= diff= merge= text
