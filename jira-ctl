@@ -1,0 +1,180 @@
+#!/usr/bin/env zsh
+#%SUMMARY: create tasks in Jira from cmdline TEMP: keep in tenjo repo
+#%USAGE: $ ./$0
+set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
+setopt brace_expand
+
+# BAD:FIND:CHECK: currentUser() don't work here
+## MAYBE: directly use python API
+# 6. API Documentation — jira-python 2.0.1rc3.dev49+g5c27f6d documentation ⌇⡞⡆⢨⠛
+#   https://jira.readthedocs.io/en/master/api.html
+
+host=${HOST:?}
+user=$USER
+proj=${PROJ:?}
+summary="[Arch] $*"
+# BUG: it seems we need "\r\n" OR "\n\n" to convert bullet-list to correct markup instead of single line
+data=TBD && [[ -t 0 ]] || data=$(</dev/stdin)
+issuetype=Task
+labels=( 'Arch/Kernel' )
+# labels=( 'Arch/Stability' 'Misc/Coredump' )
+# labels=()
+# WARN: it seems we can't change it afterwards
+estim=8h
+
+# USE: zparseopts | getopts
+
+## MOVE: aeternum/zsh
+# zparseopts -- f+:=storage -files+:=storage
+#   zparseopts with associative array in older version of zsh - Unix & Linux Stack Exchange ⌇⡞⡊⢲⠨
+#     https://unix.stackexchange.com/questions/159702/zparseopts-with-associative-array-in-older-version-of-zsh
+#   Replacing getopts with zparseopts ⌇⡞⡊⢲⠿
+#     https://zsh-users.zsh.narkive.com/XM5g52i9/replacing-getopts-with-zparseopts
+#   Re: Optimal use of zparseopts ⌇⡞⡊⢲⡆
+#     https://www.zsh.org/mla/users/2005/msg00358.html
+#   zparseopts and longopts ⌇⡞⡊⢲⡏
+#     https://www.zsh.org/mla/users/2016/msg00420.html
+#   Ubuntu Manpage: zsh-lovers - tips, tricks and examples for the Z shell ⌇⡞⡊⢲⡲
+#     http://manpages.ubuntu.com/manpages/bionic/man1/zsh-lovers.1.html
+#   ALSO:E.G. https://files.dyne.org/tomb/Tomb-2.7.tar.gz
+#     ~/sdk/Tomb-2.7/tomb
+
+typeset -A opts
+
+## DFL
+opts[host]=$host
+opts[user]=$USER
+opts[proj]=$proj
+# opts[summary]=
+opts[issuetype]=Task
+opts[data]=TBD
+# opts[labels]=
+# opts[estim]=
+
+## E.G.
+opts_labels=( $labels )
+opts[labels]=${(j:,:)labels}
+opts[estim]=8h
+# opts[prio]='Critical'
+
+# FIND: ?? How to remove "Start Date" ???
+
+# zparseopts -- f+:=storage -files+:=storage
+# zparseopts -A opts -D -K -- l+:=opts_labels -labels+:=opts_labels
+
+## THINK? priority stdin .vs. --data '' option ?
+# FIXME: don't touch "stdin" unless you have "--data=-"
+# [[ -t 0 ]] || opts[data]=$(</dev/stdin)
+
+opts[summary]="[Arch] $*"
+
+# NOTE:(sort): no easy way to sort by key :: BAD: ${(@aokv)opts}
+# print -lraC2 -- ${(kv)opts} | sort
+# print -lr -- $opts_labels
+
+# exit
+
+args=( --ssl-reqd )
+
+# DEBUG: --verbose | -D/dev/stderr
+# ((verbose)) && args+=( --verbose ) || args+=( --silent --show-error )
+# ((dryrun)) && function curl { >&2 echo curl "$@"; echo 200; }
+
+domain=${${host#*//}%%/*}
+psid=work/$domain/$user
+psfile=${PASSWORD_STORE_DIR:=~/.password-store}/$psid.gpg
+cookie=${TMPDIR:-/tmp}/$domain.cookie
+output=${TMPDIR:-/tmp}/$domain.output
+auth=
+
+[[ -f $psfile ]] && auth=$({
+  printf '%s:' $user
+  pass show -- $psid | head -n1 | head -c -1
+} | base64) || true
+
+# NOTE:(fallback): login manually
+#   => if you don't have nor pass(1), nor stored password OR some errors occured
+[[ ${auth-} ]] || args+=( --user $user )
+
+## WARN: must manually delete cookie when expired
+# [[ -s $cookie ]] && args+=( --cookie $cookie ) || args+=( --cookie-jar $cookie )
+# GET: args+=( --get --data 'os_authType=cookie' )
+
+# BUG:(zsh/2019-06-20): bash syntax "exec {fdh}<<EOT" is not supported
+#   * https://inbox.vuxu.org/zsh-workers/16fed15234db4cd724a977063f425d105600250c.camel@ntlworld.com/T/#rb7ee4cd00e3dc39fb3da927e0e263e757825d950
+#   * http://www.zsh.org/mla/workers/2017/msg00381.html
+#   BAD:(temp-file & cat): exec {fd}<=(<<EOT ...  EOT )
+#   HACK:(anonymous):  () { exec {fd}<$1 } =(); ls -l /proc/$$/fd/$fd
+# CHECK:BAD: [[ -t 0 ]] maybe "exec <<EOT {fdh}>&0" reopens "stdin"
+integer fdh
+exec <<HEADERS {fdh}>&0
+Content-Type: application/json
+X-Atlassian-Token: no-check
+${auth:+Authorization: Basic $auth}
+HEADERS
+# cat /dev/fd/$fdh  # DEBUG=heredoc
+
+
+## BAD: non-JSON output will be hidden by "jq"
+# (($+commands[jq])) \
+#   && function pretty { jq . } \
+#   || function pretty { </dev/stdin }
+function pretty { </dev/stdin }
+
+
+integer fdo
+exec {fdo}> >(pretty)
+
+args+=(
+  --header "@/dev/fd/$fdh"
+  --output "/dev/fd/$fdo"
+  --write-out '%{http_code}\n'
+)
+
+
+## GET projects list
+# args+=( --get --url "$host/rest/api/latest/project" )
+## GET issue
+# args+=( --get --url "$host/rest/api/latest/issue/$proj-34567" )
+## GET timesheet
+# args+=( --get --url "$host/rest/timesheet-gadget/latest/raw-timesheet.json" )
+
+## TODO: sequence for @/wiw/jira/jql
+#  ALSO: @/jira-cli/jira-cli.d/worklog-{add,get}
+## TODO: "Creating a sub-task" https://developer.atlassian.com/server/jira/platform/jira-rest-api-examples/
+
+## TODO: add comment IDEA: create follow-up ticket first and insert link to follow-up ticket into previous (closing) one
+# ... maybe really use python-api for jira ?
+
+## GET issue types FAIL: 404
+# args+=( --get --url "$host/rest/api/latest/issue/createmeta/$proj/issuetypes/{issueTypeId}" )
+# args+=( --get --url "$host/rest/api/latest/issue/createmeta/$proj/issuetypes" )
+
+## POST new issue
+#  => Response { "id":"39000", "key":"TEST-101", "self":"http://localhost:8080/rest/api/2/issue/39000" }
+# FIXME? [[ ${data:+x} ]] && exec <<< "$data" {fdi}>&0
+integer fdi
+exec <<JSON {fdi}>&0
+{ "fields": { "project": { "key": "$proj" }
+  , "issuetype": { "name": "$issuetype" }
+  , "assignee": { "name": "$user" }
+  , "labels": ["${(j:", ":)labels}"]
+  , "summary": "$summary"
+  , "description": "$data"
+  , "timetracking": { "originalEstimate": "$estim", "remainingEstimate": "$estim" }
+} }
+JSON
+# </dev/fd/$fdi  # DEBUG=
+
+args+=( -X POST --data @/dev/fd/$fdi --url "$host/rest/api/latest/issue" )
+# print -l -- $args  # DEBUG=
+
+code=$(curl $args)
+# curl --verbose $args  # DEBUG=
+
+case $code      #%VIZ: <error codes>
+in 200) exit 0  #% 0 = success
+;; 401) exit 3  #% 3 = authorization
+;; 403) exit 3  #% 3 = authorization
+;;   *) exit 1  #% 1 = other HTTP error
+esac            #% 2 = inner error
