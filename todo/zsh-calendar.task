@@ -1,0 +1,5 @@
+TRY: incorporate zshcalsys(1)
+
+  [_] READ: $ man zshcalsys(1)
+  [_] CMP: with my idea
+  [_] TRY: simplify tenjo by reusing zshcalsys(1)
