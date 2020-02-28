@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 #%SUMMARY:
 #%USAGE: $ ./$0
-set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
+set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 
 # TODO: replace on install by /usr/share/tenjo/functions
 lib=$0:A:h/functions
@@ -35,13 +35,26 @@ function task_expand { local task=$1
   mv -vT "${task}${sfx}" "${task}"
 }
 
+function task_xtref {
+  local xtcmd=( r.vim-xtref )
+  (( ${+commands[$xtcmd]} ))
+  $xtcmd
+}
+
+
+declare task=${${*}%.task}.task
+
 case $action
 in add)
-  touch "$*.task"
+  # touch "$task"
+  [[ -e $task ]] && { >&2 print -rl -- "Err:($action): already exists '$task'" "  BET: use \$ tenjo edit '$task'"; exit 1 }
+  task_xtref > $task
+
+;; edit)
+  [[ -e $task ]] || task_xtref > $task
+  $EDITOR -- $task
 
 ;; expand)
-  task=$*
-  task=${task%.task}.task
   task_expand $task
 
 ;; fix)

@@ -24,21 +24,6 @@ estim=8h
 
 # USE: zparseopts | getopts
 
-## MOVE: aeternum/zsh
-# zparseopts -- f+:=storage -files+:=storage
-#   zparseopts with associative array in older version of zsh - Unix & Linux Stack Exchange ⌇⡞⡊⢲⠨
-#     https://unix.stackexchange.com/questions/159702/zparseopts-with-associative-array-in-older-version-of-zsh
-#   Replacing getopts with zparseopts ⌇⡞⡊⢲⠿
-#     https://zsh-users.zsh.narkive.com/XM5g52i9/replacing-getopts-with-zparseopts
-#   Re: Optimal use of zparseopts ⌇⡞⡊⢲⡆
-#     https://www.zsh.org/mla/users/2005/msg00358.html
-#   zparseopts and longopts ⌇⡞⡊⢲⡏
-#     https://www.zsh.org/mla/users/2016/msg00420.html
-#   Ubuntu Manpage: zsh-lovers - tips, tricks and examples for the Z shell ⌇⡞⡊⢲⡲
-#     http://manpages.ubuntu.com/manpages/bionic/man1/zsh-lovers.1.html
-#   ALSO:E.G. https://files.dyne.org/tomb/Tomb-2.7.tar.gz
-#     ~/sdk/Tomb-2.7/tomb
-
 typeset -A opts
 
 ## DFL

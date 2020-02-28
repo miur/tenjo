@@ -27,6 +27,7 @@ function _tenjo_init {
   # declare -rn A=_tenjo_alias
   _tenjo_alias t  tenjo
   _tenjo_alias ta tenjo add
+  _tenjo_alias te tenjo edit
   _tenjo_alias tx tenjo expand
 }
 
