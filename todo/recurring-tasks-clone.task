@@ -12,10 +12,10 @@ IDEA: clone task templates into real e.g. "2020-02-13_18:00" folders
   * for period < 1 week -- add next event only after current one expired
     i.e. keep only one daily task in queue
 
-USE: hook script -- run after each command
+USE: hook script -- run after each command ⌇⡞⡖⢣⡆
   * decide if needed to regenerate recurring tasks
   * immediately commit into git new copies of tasks
 
 
-MAYBE: use systemd/cron to generate recurring tasks
+MAYBE: use systemd/cron to generate recurring tasks ⌇⡞⡖⢣⡈
   -- if I wish for realtime notifications / timetracking anyway

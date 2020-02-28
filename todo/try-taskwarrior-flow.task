@@ -1,0 +1,4 @@
+  [_] TRY: taskwarrior flow ⌇⡞⡖⢠⠓
+    [_] REQ: git repo for shared taskmgmt
+      2020-02-26 [X] ALT: use mounted sftp
+    [_] OR: open local port for taskmgmt server to merge tasks
