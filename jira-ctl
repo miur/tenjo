@@ -1,7 +1,7 @@
 #!/usr/bin/env zsh
 #%SUMMARY: create tasks in Jira from cmdline TEMP: keep in tenjo repo
-#%USAGE: $ ./$0
-set -r -o errexit -o noclobber -o noglob -o nounset -o pipefail
+#%USAGE: $ ./$0 [-x] -l labA,labB -e 8h -- summary... [<<< $'description\n- item1\n- ...']
+set -o errexit -o noclobber -o noglob -o nounset -o pipefail
 setopt brace_expand
 
 # BAD:FIND:CHECK: currentUser() don't work here
@@ -9,77 +9,86 @@ setopt brace_expand
 # 6. API Documentation — jira-python 2.0.1rc3.dev49+g5c27f6d documentation ⌇⡞⡆⢨⠛
 #   https://jira.readthedocs.io/en/master/api.html
 
-host=${HOST:?}
-user=$USER
-proj=${PROJ:?}
-summary="[Arch] $*"
-# BUG: it seems we need "\r\n" OR "\n\n" to convert bullet-list to correct markup instead of single line
-data=TBD && [[ -t 0 ]] || data=$(</dev/stdin)
-issuetype=Task
-labels=( 'Arch/Kernel' )
-# labels=( 'Arch/Stability' 'Misc/Coredump' )
-# labels=()
-# WARN: it seems we can't change it afterwards
-estim=8h
-
-# USE: zparseopts | getopts
-
 typeset -A opts
 
+## ATT: must not define them BAD: cmdline flags don't add any value
+# opts[--dryrun]=
+# opts[--execute]=
+# opts[--verbose]=
+
 ## DFL
-opts[host]=$host
-opts[user]=$USER
-opts[proj]=$proj
-# opts[summary]=
-opts[issuetype]=Task
-opts[data]=TBD
-# opts[labels]=
-# opts[estim]=
+opts[--host]=${JIRA_HOST:-}
+opts[--user]=${JIRA_USER:-$USER}
+opts[--project]=${JIRA_PROJ:-}
 
-## E.G.
-opts_labels=( $labels )
-opts[labels]=${(j:,:)labels}
-opts[estim]=8h
+## TASK
+opts[--issuetype]=Task
 # opts[prio]='Critical'
+opts[--summary]=
+opts[--description]=   # OR: TBD
+opts[--estimate]=  # OR: 8h  # WARN: it seems we can't change it afterwards
 
-# FIND: ?? How to remove "Start Date" ???
+opts[--prefix]='[Arch]'
+opts[--labels]=  # NOTE: comma-separated list
 
-# zparseopts -- f+:=storage -files+:=storage
-# zparseopts -A opts -D -K -- l+:=opts_labels -labels+:=opts_labels
 
-## THINK? priority stdin .vs. --data '' option ?
-# FIXME: don't touch "stdin" unless you have "--data=-"
-# [[ -t 0 ]] || opts[data]=$(</dev/stdin)
+# WARN: use "-l aaa -l ,bbb" to append labels -- they are simply concatenated
+# ALT:(-a opts): use getopts for post-processing
+typeset -a -- spec=(
+  'v=-verbose'       '-verbose'
+  'n=-dryrun'        '-dryrun'
+  'x=-execute'       '-execute'
 
-opts[summary]="[Arch] $*"
+  'H:=-host'         '-host:'
+  'u:=-user'         '-user:'
+  'j:=-project'      '-project:'
 
-# NOTE:(sort): no easy way to sort by key :: BAD: ${(@aokv)opts}
-# print -lraC2 -- ${(kv)opts} | sort
-# print -lr -- $opts_labels
+  't::=-issuetype'   '-issuetype::'
+  's::=-summary'     '-summary::'
+  'd::=-description' '-description::'
+  'e::=-estimate'    '-estimate::'
+  'p::=-prefix'      '-prefix::'
 
-# exit
+  'l+:=-labels'      '-labels+:'
+)
+zparseopts -A opts -D -F -K -M -- $spec
+
+
+# NOTE: append "/dev/stdin" to cmdline "--data" to form description
+#   [_] ALT:FIXME: don't touch "stdin" unless you have "--data=-"
+[[ -t 0 ]] || opts[--description]+=${opts[--description]:+$'\n'}$(</dev/stdin)
+
+# NOTE: open editor if no supplied description
+#   [_] FIXME: don't open editor if supplied empty "--data=''"
+#   [_] FIXME: don't open editor if used <<< ""
+((${opts[--description]:+1})) || opts[--description]=$(vipe </dev/null)
+
+# NOTE: jira needs '\r\n' -- otherwise whole text is placed on single line
+opts[--description]=${${opts[--description]//\\/\\\\}//$'\n'/\\r\\n}
+
+((${opts[--summary]:+1})) || opts[--summary]="$opts[--prefix] ${*:?Need summary}"
+
 
 args=( --ssl-reqd )
 
 # DEBUG: --verbose | -D/dev/stderr
-# ((verbose)) && args+=( --verbose ) || args+=( --silent --show-error )
-# ((dryrun)) && function curl { >&2 echo curl "$@"; echo 200; }
+((${+opts[--verbose]})) && args+=( --verbose ) || args+=( --silent --show-error )
 
-domain=${${host#*//}%%/*}
-psid=work/$domain/$user
+domain=${${opts[--host]#*//}%%/*}
+psid=work/$domain/$opts[--user]
 psfile=${PASSWORD_STORE_DIR:=~/.password-store}/$psid.gpg
 cookie=${TMPDIR:-/tmp}/$domain.cookie
 output=${TMPDIR:-/tmp}/$domain.output
 auth=
 
 [[ -f $psfile ]] && auth=$({
-  printf '%s:' $user
+  printf '%s:' $opts[--user]
   pass show -- $psid | head -n1 | head -c -1
 } | base64) || true
 
 # NOTE:(fallback): login manually
 #   => if you don't have nor pass(1), nor stored password OR some errors occured
-[[ ${auth-} ]] || args+=( --user $user )
+[[ ${auth-} ]] || args+=( --user "$opts[--user]" )
 
 ## WARN: must manually delete cookie when expired
 # [[ -s $cookie ]] && args+=( --cookie $cookie ) || args+=( --cookie-jar $cookie )
@@ -118,11 +127,11 @@ args+=(
 
 
 ## GET projects list
-# args+=( --get --url "$host/rest/api/latest/project" )
+# args+=( --get --url "$opts[--host]/rest/api/latest/project" )
 ## GET issue
-# args+=( --get --url "$host/rest/api/latest/issue/$proj-34567" )
+# args+=( --get --url "$opts[--host]/rest/api/latest/issue/${opts[--project]}-34567" )
 ## GET timesheet
-# args+=( --get --url "$host/rest/timesheet-gadget/latest/raw-timesheet.json" )
+# args+=( --get --url "$opts[--host]/rest/timesheet-gadget/latest/raw-timesheet.json" )
 
 ## TODO: sequence for @/wiw/jira/jql
 #  ALSO: @/jira-cli/jira-cli.d/worklog-{add,get}
@@ -132,30 +141,52 @@ args+=(
 # ... maybe really use python-api for jira ?
 
 ## GET issue types FAIL: 404
-# args+=( --get --url "$host/rest/api/latest/issue/createmeta/$proj/issuetypes/{issueTypeId}" )
-# args+=( --get --url "$host/rest/api/latest/issue/createmeta/$proj/issuetypes" )
+# args+=( --get --url "$opts[--host]/rest/api/latest/issue/createmeta/$opts[--project]/issuetypes/{issueTypeId}" )
+# args+=( --get --url "$opts[--host]/rest/api/latest/issue/createmeta/$opts[--project]/issuetypes" )
 
 ## POST new issue
 #  => Response { "id":"39000", "key":"TEST-101", "self":"http://localhost:8080/rest/api/2/issue/39000" }
-# FIXME? [[ ${data:+x} ]] && exec <<< "$data" {fdi}>&0
+# FIND: ?? How to remove "Start Date" ???
+# FIXME? [[ ${opts[--description]:+x} ]] && exec <<< "${opts[--description]}" {fdi}>&0
 integer fdi
 exec <<JSON {fdi}>&0
-{ "fields": { "project": { "key": "$proj" }
-  , "issuetype": { "name": "$issuetype" }
-  , "assignee": { "name": "$user" }
-  , "labels": ["${(j:", ":)labels}"]
-  , "summary": "$summary"
-  , "description": "$data"
-  , "timetracking": { "originalEstimate": "$estim", "remainingEstimate": "$estim" }
+{ "fields": { "project": { "key": "${opts[--project]:?}" }
+  , "issuetype": { "name": "${opts[--issuetype]:?}" }
+  , "assignee": { "name": "${opts[--user]:?}" }
+  , "labels": ["${(j:", ":)${(s:,:)opts[--labels]:?}}"]
+  , "summary": "${opts[--summary]:?}"
+  , "description": "$opts[--description]"
+  , "timetracking": { "originalEstimate": "${opts[--estimate]:?}", "remainingEstimate": "${opts[--estimate]:?}" }
 } }
 JSON
 # </dev/fd/$fdi  # DEBUG=
 
-args+=( -X POST --data @/dev/fd/$fdi --url "$host/rest/api/latest/issue" )
-# print -l -- $args  # DEBUG=
+if ((!${+opts[--execute]})); then
+  jq . </dev/fd/$fdi
+  exit
+fi
+
+args+=( -X POST --data @/dev/fd/$fdi --url "$opts[--host]/rest/api/latest/issue" )
+
+# ALT: dryrun=${+fopts[(r)(-n|--dry-run)]}
+#   OR: annexonly=$(( ! ${+fopts[(r)(-a|--allow-non-annex)]} ))
+((${+opts[--dryrun]})) && function curl {
+  {
+    print OPTS
+    print -lraNC2 -- "${(@kvq-)opts//$'\n'/\n}" | sort -z | tr \\0 \\n | nl -s' ' -w4
+    print CURL_ARGS
+    nl -s' ' -w4 <<< "${(pj:\n-:)${(s: -:)args[*]}}"
+    print CURL_HEADERS
+    nl -s' ' -w3 </dev/fd/$fdh
+    print -rn CURL_JSON=
+    jq . </dev/fd/$fdi
+  } > /dev/fd/$fdo
+  print 200
+}
 
 code=$(curl $args)
-# curl --verbose $args  # DEBUG=
+
+((${+opts[--dryrun]})) && </dev/fd/$fdo
 
 case $code      #%VIZ: <error codes>
 in 200) exit 0  #% 0 = success
