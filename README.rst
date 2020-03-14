@@ -2,6 +2,11 @@
 
 .. SPDX-License-Identifier: Apache-2.0
 
+.. SRC: https://stackoverflow.com/questions/10870719/inline-code-highlighting-in-restructuredtext
+.. TODO: add prefix '$ ' before each command
+.. role:: bash(code)
+   :language: bash
+
 #####
 tenjo
 #####
@@ -100,6 +105,7 @@ USAGE
 .. warning::
    Remember! ``tenjo(1)`` implementation is nothing more than "convenient and efficient tool".
    You can manage tasks fully manually by using only ``git(1)`` and your favorite **file manager**.
+   SEE: :title`Workflow (grassroots)`
 
 Install ``tenjo``, create convenient alias for yourself, and register ``pre-commit`` hook in git main tasks-repo:
 
@@ -112,8 +118,73 @@ Install ``tenjo``, create convenient alias for yourself, and register ``pre-comm
 
 TBD
 
-Workflow
-========
+ARCH
+====
+
+You have 3 degrees of freedom:
+  * project-graph nesting (xpath) :: Supergroup Group Project Subproject Task Subtask Dependency
+  * task-lifecycle status (flow) :: {Pending | Now | Done | Seized}
+  * task-mgmt distribution (planning) :: Prio User {Undecided(New) | Next | Someday | BacklogForDuration(CW09) | DecideAtDate(2020-04-02)}
+
+Conventional ideas are simulated:
+  * To express *blocked-by* create a new symlinked subtask inside task (dependency).
+  * TEMP: *due-date* is meaningless in personal flow as it affects only priority on current day
+    (However it may become quite interesting if you diligently estimate each
+    your task -- you would be able to auto-prioritize tasks based on the time
+    left to deadline and remind yourself to write follow-up mails that you
+    can't accomplish some chosen task on the time)
+  * You have 5 ways to express *In-Progress* status depending on who has decision power
+    (i.e. you yourself or only your PM can decide which task from the list you will be doing now)
+    + create symlink named ``!now`` directly to your task (yes, you can't work on multiple things at the same time)
+    + move task to folder ``!now`` inside your own ``@user`` folder (NICE: task is actually **moved** from the backlog)
+    + create inside folder ``!now`` symlink to your own task (NICE: task keeps its xpath location)
+    + use single folder ``!now`` in project-root and move/symlink tasks into its subfolders ``!now/@user/``
+    + use additional folder ``!now`` in project-root to contain symlinks to all ``!now`` tasks (only for mngr|can auto-gen)
+
+Each task undergoes evolution and accumulates path-prefixes along the way::
+
+    Task -> Project -> Prio -> User -> {Now|Date} -> {Done|Cancel} -> Seized
+
+Resulting path is striving to be self-explanatory, e.g:
+
+* CASE (1) single person::
+
+    ./my-project/clarify-rq.task
+    ./my-project/next/clarify-rq.task
+    ./my-project/!now/clarify-rq.task
+    ./my-project/.done/clarify-rq.task
+    ./my-project/.seized/clarify-rq.task
+
+* CASE (2) team distributes tasks::
+
+    ./my-project/clarify-rq.task
+    ./my-project/backlog/clarify-rq.task
+    ./my-project/@user/clarify-rq.task
+    ./my-project/@user/!now/clarify-rq.task
+    ./my-project/.done/@user/clarify-rq.task
+
+* CASE (3) manager affects priority::
+
+    ./my-project/clarify-rq.task
+    ./my-project/3/clarify-rq.task
+    ./my-project/3/@user/clarify-rq.task
+    ./my-project/3/@user/!now/clarify-rq.task  <--  ./my-project/!now/clarify-rq.task
+    ./my-project/.done/3/@user/clarify-rq.task
+
+
+Workflow (simplest)
+===================
+
+* ADD:  :bash:`$ tenjo add clarify rq`
+* EDIT: :bash:`$ tenjo edit clarify rq`
+* NOW:  :bash:`$ tenjo now clarify rq`
+* DONE: :bash:`$ tenjo done clarify rq`
+* MARK: :bash:`$ tenjo mark clarify rq`
+* MOVE: :bash:`$ tenjo move dst-project` NEED: ※⡞⡬⣇⡃
+
+
+Workflow (grassroots)
+=====================
 
 Project management must never be harder than moving files by file manager.
 Look at captivating simplicity of such workflow, easy enough even from cmdline:
