@@ -1,0 +1,2 @@
+IDEA: if file with any extension starts with exactly UUID or XTREF anchor -- then it's a task file format
+  NICE: then "!now" symlink w/o extension will have syntax highlighted
