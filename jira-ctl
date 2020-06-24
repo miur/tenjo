@@ -28,6 +28,9 @@ opts[--summary]=
 opts[--description]=   # OR: TBD
 opts[--estimate]=  # OR: 8h  # WARN: it seems we can't change it afterwards
 
+# TODO: array of words (Arch, Project, Domain, PoC, Qemu)
+#   --> surround each one by [...] and merge into e.g. '[Domain][POC]'
+#   => BET: do it in python. For such ctl complexities ZSH is a failure :(
 opts[--prefix]='[Arch]'
 opts[--labels]=  # NOTE: comma-separated list
 
